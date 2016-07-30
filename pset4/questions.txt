@@ -1,0 +1,19 @@
+0.  BMP: 16777216, GIF: 256, JPEG: 16777216, PNG: 16777216 or 281474976710656
+1.  GIF
+2.  lossy compresion impacts imagine quality while lossless does not.
+3.  PNG
+4.  First, the system modifies the filename’s first character in the file’s directory entry, then moves all of the file’s FAT clus- ters to the hard drive’s list of free clusters
+5.  intentionally overwrite that data with other data
+6.  stdint.h enables us to use types such as uint8_t, uint32_t, int32_t, and uint16_t.
+7.  1, 4, 4, 2
+8.  ASCII
+9.  bfSize is the size, in bytes, of the bitmap file while biSize is the number of bytes required by BITMAPINFOHEADER.
+10. The bitmap is a top-down DIB with the origin at the upper left corner.
+11. biBitCount
+12. No permission or anything else prevents the writer of the file.
+13. Only once of read is needed.
+14. 3
+15. To change the offset of the file pointer
+16. SEEK_CUR means changing the location of the pointer from its current location
+17. Jason Hirschhorn?
+18. TODO
