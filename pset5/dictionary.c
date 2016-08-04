@@ -60,7 +60,7 @@ bool check(const char* word)
 bool load(const char* dictionary)
 {
 
-    root = calloc(1, sizeof(node));
+    root = malloc(sizeof(node));
     
     FILE* fp = fopen(dictionary, "r");
     if (fp == NULL) {
@@ -84,13 +84,15 @@ bool load(const char* dictionary)
             }
             
             if (cnode->children[idx] == NULL) {
-                cnode->children[idx] = calloc(1, sizeof(node));
+                cnode->children[idx] = malloc(sizeof(node));
             }
             cnode = cnode->children[idx];
         }
         cnode->isWord = true;
         count++;
     }
+    
+    fclose(fp);
     return true;
 }
 
@@ -112,11 +114,9 @@ bool unload(void)
 }
 
 void unloadNode(node* cnode) {
-    if (cnode->isWord == false) {
-        for (int i = 0; i < 27; i++) {
-            if (cnode->children[i] != NULL) {
-                unloadNode(cnode->children[i]);
-            }
+    for (int i = 0; i < 27; i++) {
+        if (cnode->children[i] != NULL) {
+            unloadNode(cnode->children[i]);
         }
     }
     free(cnode);

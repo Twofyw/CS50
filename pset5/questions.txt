@@ -1,11 +1,12 @@
-0.  TODO
-1.  TODO
-2.  TODO
-3.  TODO
-4.  TODO
-5.  TODO
-6.  TODO
-7.  TODO
-8.  TODO
-9.  TODO
+0.  An example of maximum length for a word
+1.  getrusage gets information about resource utilization
+2.  Because the rusage structure is kind of big so passing it by reference instead of copying it avoids resource waste.
+3.  In each iteration, the for loop reads a character from text and store it in variable c. Then the multiple if conditions put the letter characters into a word or simply ignore others to prepare a word ready for spell check.
+4.  fscanf doesn't check if the string read is a word or number or anything else so the spell checker may receive something that is not consisted of letters.
+5.  A constant cannot be modified so that it won't be changed anyhow.
+/ind
+6.  Trie. Each node consists of a mark, "isWord", to mark the end of a word is reached, and 27 children nodes that indicates whether the letter exsists in the dictionary or not and enable the structure to accept another letter afterwards.
+7.  It took 2.5x the time of the staff's solution when checking texts/austinpowers.txt.
+8.  I use malloc instead of calloc since it doesn't errs even I don't zero the memory using malloc.
+9.  Yes. The structure used by a trie is too large do loading dictionary takes too much time.
 10. TODO
