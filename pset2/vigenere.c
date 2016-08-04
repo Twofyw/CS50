@@ -1,3 +1,6 @@
+/*
+* This program is too complecated because I didn't know there are functions called toupper() and to lower()
+*/
 #include <stdio.h>
 #include <cs50.h>
 #include <stdlib.h>
