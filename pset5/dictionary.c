@@ -62,7 +62,6 @@ bool load(const char* dictionary)
 
     root = calloc(1, sizeof(node));
     
-
     FILE* fp = fopen(dictionary, "r");
     if (fp == NULL) {
         printf("Dictionary missing\n");
@@ -70,10 +69,12 @@ bool load(const char* dictionary)
     }
 
     char word[LENGTH + 1];
-
+    
+    // + 2 = "\n" + "\0"
     for (fgets(word, LENGTH + 2, fp); feof(fp) == 0; fgets(word, LENGTH + 2, fp)) {
-        
         node* cnode = root;
+        
+        // - 1 = - "\n"
         for (int i = 0,l = strlen(word) - 1; i < l; i++) {
             int idx;
             if (word[i] == '\'') {
@@ -81,6 +82,7 @@ bool load(const char* dictionary)
             } else {
                 idx = word[i] - 97;
             }
+            
             if (cnode->children[idx] == NULL) {
                 cnode->children[idx] = calloc(1, sizeof(node));
             }
@@ -116,6 +118,6 @@ void unloadNode(node* cnode) {
                 unloadNode(cnode->children[i]);
             }
         }
-        free(cnode);
     }
+    free(cnode);
 }
