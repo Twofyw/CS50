@@ -50,7 +50,7 @@ void interpret(const char* path, const char* query);
 void list(const char* path);
 bool load(FILE* file, BYTE** content, size_t* length);
 const char* lookup(const char* path);
-bool parse(const char* line, char* path, char* query);
+bool parse(char* line, char* path, char* query);
 const char* reason(unsigned short code);
 void redirect(const char* uri);
 bool request(char** message, size_t* length);
@@ -618,8 +618,26 @@ bool load(FILE* file, BYTE** content, size_t* length)
  */
 const char* lookup(const char* path)
 {
-    // TODO
-    return NULL;
+    char* ext = strrchr(path, '.') + 1;
+    if (strcasecmp(ext, "css") == 0) {
+        return "text/css";
+    } else if (strcasecmp(ext, "html") == 0) {
+        return "text/html";
+    } else if (strcasecmp(ext, "gif") == 0) {
+        return "image/gif";
+    } else if (strcasecmp(ext, "ico") == 0) {
+        return "image/x-icon";
+    } else if (strcasecmp(ext, "jpg") == 0) {
+        return "image/ipeg";
+    } else if (strcasecmp(ext, "js") == 0) {
+        return "text/javascript";
+    } else if (strcasecmp(ext, "php") == 0) {
+        return "text/x-php";
+    } else if (strcasecmp(ext, "png") == 0) {
+        return "image/png";
+    } else {
+        return NULL;
+    }
 }
 
 /**
@@ -627,11 +645,52 @@ const char* lookup(const char* path)
  * and its query string at query, both of which are assumed
  * to be at least of length LimitRequestLine + 1.
  */
-bool parse(const char* line, char* abs_path, char* query)
+bool parse(char* line, char* abs_path, char* query)
 {
-    // TODO
-    error(501);
-    return false;
+    // error check
+    int sc = 0;
+    int sl[2];
+    for (int i = 0; i < strlen(line); i++) {
+        if (line[i] == ' ') {
+            if (sc < 3) {
+                sl[sc] = i;
+                sc++;
+            } else {
+                error(400);
+                return false;
+            }
+        }
+        // contains """
+        if (sc == 1 && line[i] == '\"') {
+            error(400);
+            return false;
+        }
+    }
+    char* request_target = NULL;
+    char* HTTP_version = NULL;
+    request_target = line + sl[0] + 1;
+    HTTP_version = line + sl[1] + 1;
+    
+    if (strncmp(line, "GET", sl[0]) != 0) {
+        error(405);
+        return false;
+    } else if (strncmp(request_target, "/", 1) != 0) {
+        error(501);
+        return false;
+    } else if (strncmp(HTTP_version, "HTTP/1.1", 8) != 0) {
+        error(505);
+        return false;
+    }
+    char* quesmark = strchr(request_target, '?');
+    if (quesmark != NULL) {
+        strncpy(abs_path, request_target, quesmark - request_target);
+        strncpy(query, quesmark, line + sl[1] - quesmark);
+    } else {
+        strncpy(abs_path, request_target, line + sl[1] - request_target);
+        query = NULL;
+    }
+    
+    return true;
 }
 
 /**
