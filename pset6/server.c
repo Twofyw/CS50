@@ -71,7 +71,7 @@ bool signaled = false;
 
 int main(int argc, char* argv[])
 {
-    // a global variable defined in errno.h that's "set by system 
+    // a global variable defined in errno.h that's "set by system
     // calls and some library functions [to a nonzero value]
     // in the event of an error to indicate what went wrong"
     errno = 0;
@@ -267,7 +267,7 @@ int main(int argc, char* argv[])
 }
 
 /**
- * Checks (without blocking) whether a client has connected to server. 
+ * Checks (without blocking) whether a client has connected to server.
  * Returns true iff so.
  */
 bool connected(void)
@@ -326,7 +326,7 @@ void freedir(struct dirent** namelist, int n)
         free(namelist);
     }
 }
- 
+
 /**
  * Handles signals.
  */
@@ -444,8 +444,26 @@ char* htmlspecialchars(const char* s)
  */
 char* indexes(const char* path)
 {
-    // TODO
-    return NULL;
+    char* php = malloc(strlen(path) + strlen("/index.php") + 1);
+    char* html = malloc(strlen(path) + strlen("/index.html") + 1);
+    strcpy(php, path);
+    strcpy(html, path);
+    strcat(php, "/index.php");
+    strcat(html, "/index.html");
+    char* retur;
+    if (access(php, F_OK) == 0) {
+        retur = php;
+    } else if (access(html, F_OK) == 0) {
+        retur = html;
+    } else {
+        retur = NULL;
+    }
+    if (php != NULL) {
+        free(php);
+    } else {
+        free(html);
+    }
+    return retur;
 }
 
 /**
@@ -609,8 +627,19 @@ void list(const char* path)
  */
 bool load(FILE* file, BYTE** content, size_t* length)
 {
-    // TODO
-    return false;
+    if (file == NULL) {
+        return false;
+    }
+    int i = 0;
+    BYTE* data = malloc(sizeof(BYTE));
+    for (int c = fgetc(file); c != EOF; data = realloc(data, sizeof(char) * (i + 1))) {
+        data[i] = c;
+        c = fgetc(file);
+        i++;
+    }
+    *content = data;
+    *length = i;
+    return true;
 }
 
 /**
@@ -628,7 +657,7 @@ const char* lookup(const char* path)
     } else if (strcasecmp(ext, "ico") == 0) {
         return "image/x-icon";
     } else if (strcasecmp(ext, "jpg") == 0) {
-        return "image/ipeg";
+        return "image/jpeg";
     } else if (strcasecmp(ext, "js") == 0) {
         return "text/javascript";
     } else if (strcasecmp(ext, "php") == 0) {
@@ -641,7 +670,7 @@ const char* lookup(const char* path)
 }
 
 /**
- * Parses a request-line, storing its absolute-path at abs_path 
+ * Parses a request-line, storing its absolute-path at abs_path
  * and its query string at query, both of which are assumed
  * to be at least of length LimitRequestLine + 1.
  */
@@ -650,7 +679,7 @@ bool parse(char* line, char* abs_path, char* query)
     // error check
     int sc = 0;
     int sl[2];
-    for (int i = 0; i < strlen(line); i++) {
+    for (int i = 0, l = strlen(line); i < l; i++) {
         if (line[i] == ' ') {
             if (sc < 3) {
                 sl[sc] = i;
@@ -660,7 +689,7 @@ bool parse(char* line, char* abs_path, char* query)
                 return false;
             }
         }
-        // contains """
+        // contains "\""
         if (sc == 1 && line[i] == '\"') {
             error(400);
             return false;
@@ -670,7 +699,7 @@ bool parse(char* line, char* abs_path, char* query)
     char* HTTP_version = NULL;
     request_target = line + sl[0] + 1;
     HTTP_version = line + sl[1] + 1;
-    
+
     if (strncmp(line, "GET", sl[0]) != 0) {
         error(405);
         return false;
@@ -684,12 +713,14 @@ bool parse(char* line, char* abs_path, char* query)
     char* quesmark = strchr(request_target, '?');
     if (quesmark != NULL) {
         strncpy(abs_path, request_target, quesmark - request_target);
-        strncpy(query, quesmark, line + sl[1] - quesmark);
+        strncpy(query, quesmark + 1, line + sl[1] - quesmark);
+        abs_path[quesmark - request_target] = '\0';
+        query[line + sl[1] - quesmark + 1] = '\0';
     } else {
         strncpy(abs_path, request_target, line + sl[1] - request_target);
-        query = NULL;
+        query[0] = '\0';
+        abs_path[line + sl[1] - request_target] = '\0';
     }
-    
     return true;
 }
 
@@ -749,7 +780,7 @@ bool request(char** message, size_t* length)
     *message = NULL;
     *length = 0;
 
-    // read message 
+    // read message
     while (*length < LimitRequestLine + LimitRequestFields * LimitRequestFieldSize + 4)
     {
         // read from socket
@@ -766,7 +797,7 @@ bool request(char** message, size_t* length)
             break;
         }
 
-        // append bytes to message 
+        // append bytes to message
         *message = realloc(*message, *length + bytes + 1);
         if (*message == NULL)
         {
@@ -877,7 +908,7 @@ void respond(int code, const char* headers, const char* body, size_t length)
     }
 
     // respond with CRLF
-    if (dprintf(cfd, "\r\n") < 0)
+    if (dprintf(cfd, "\r\n\r\n") < 0)
     {
         return;
     }
@@ -1064,7 +1095,7 @@ char* urldecode(const char* s)
     {
         return NULL;
     }
-    
+
     // iterate over characters in s, decoding percent-encoded octets, per
     // https://www.ietf.org/rfc/rfc3986.txt
     for (int i = 0, j = 0, n = strlen(s); i < n; i++, j++)
