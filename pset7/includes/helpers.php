@@ -78,7 +78,7 @@
             "http" => [
                 "header" => implode(array_map(function($value, $key) { return sprintf("%s: %s\r\n", $key, $value); }, $headers, array_keys($headers))),
                 "method" => "GET",
-				"proxy" => "tcp://cock.0.6180339.in:21783",
+				"proxy" => "tcp://seal.3.141592.in:16686",
                 "request_fulluri" => true
             ]
         ]);
